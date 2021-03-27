@@ -1,0 +1,12 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+build
+*.local  
+main.js
+main.js.map
+preload.js
+preload.js.map
+yarn-error.log
+yarn.lock

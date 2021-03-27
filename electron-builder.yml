@@ -1,0 +1,19 @@
+productName: "HelloVite"
+appId: "io.vite.electron.template"
+
+asar: true
+# compression: maximum
+
+directories:
+  app: ./build
+  buildResources: "resources"
+  output: "dist"
+
+win:
+  target:
+    - "zip"
+    # - "nsis"
+
+nsis:
+  oneClick: true
+  perMachine: true

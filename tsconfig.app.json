@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "lib": ["esnext"],
+    "types": ["@types/node"],
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/app/**/*.ts", "src/app/**/*.d.ts", "src/app/**/*.tsx"],
+  "exclude": ["node_modules"]
+}
