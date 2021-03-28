@@ -121,7 +121,7 @@ async function buildProd(opts: BuildHookOptions = {}) {
     let a = await b.generate({});
     await b.write({
       file: path.resolve(process.cwd(), "build", "main.js"),
-      sourcemap: true,
+      sourcemap: false,
       format: "cjs",
     });
     console.log(
@@ -153,14 +153,14 @@ async function buildProd(opts: BuildHookOptions = {}) {
       let a = await b.generate({});
       await b.write({
         file: path.resolve(process.cwd(), "build", "preload.js"),
-        sourcemap: true,
+        sourcemap: false,
         format: "cjs",
       });
       console.log(
         chalk.cyan.bold("  vite:electron:build"),
         "\t",
         " Preload Script Builded",
-        chalk.gray("(dev)")
+        chalk.gray("(prod)")
       );
     }
   } catch (e) {

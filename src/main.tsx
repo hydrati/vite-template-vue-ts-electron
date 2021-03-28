@@ -3,7 +3,9 @@ import State from './state';
 import { createApp } from "vue";
 import App from "./App";
 
-createApp(App)
+const app = createApp(App)
   .use(Router)
   .use(State)
   .mount("#app");
+
+  

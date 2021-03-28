@@ -6,6 +6,7 @@ import path from "path";
 import builder from "./builder";
 import electronBuilder from "electron-builder";
 import fs from "fs-extra";
+import { BuildFilter } from "./filter";
 import chalk from "chalk";
 
 export interface ServeHookOptions {
@@ -76,38 +77,61 @@ export interface BuildHookOptions {
   preload?: string;
 }
 
-export const buildHook: (opts?: BuildHookOptions) => Plugin[] = (opt = {}) => [
-  {
-    name: "vite:electron-builder:hook",
-    apply: "build",
-    config(c) {
-      if (c.build == undefined) c.build = {};
-      c.build.outDir = "build";
-      return c;
+export const buildHook: (
+  opts?: BuildHookOptions,
+  s?: ServeHookOptions
+) => Plugin[] = (opt = {}, s = {}) => {
+  const SKIP = [...(s?.filter?.include ?? []), ...SKIP_MODULES];
+  return [
+    BuildFilter(SKIP),
+    {
+      name: "vite:electron-builder:hook",
+      apply: "build",
+      config(c) {
+        if (c.build == undefined) c.build = {};
+        c.build.outDir = "build";
+        return c;
+      },
+      resolveId(source, importer, options) {
+        console.log(source, importer, options);
+        return false;
+      },
+      async transform(_, id) {
+        if (SKIP.indexOf(id) > -1) {
+          return {
+            code:
+              "const __esModule = false; export {__esModule}; const o = " +
+              (s.filter.requireFn ?? "globalThis.require") +
+              "('" +
+              id +
+              "'); export {o as default};",
+          };
+        }
+      },
+      async closeBundle() {
+        console.log("");
+        console.log(
+          "  " + chalk.cyanBright.bold("vite:electron:build:hook"),
+          "\tRenderer Builded"
+        );
+        await builder("prod", opt);
+        console.log(
+          "  " + chalk.cyanBright.bold("vite:electron:build"),
+          "\t Write `package.json`"
+        );
+        let s = JSON.parse(
+          fs.readFileSync(path.resolve(process.cwd(), "package.json"), "utf8")
+        );
+        delete s["scripts"];
+        fs.writeFileSync(
+          path.resolve(process.cwd(), "build", "package.json"),
+          JSON.stringify(s)
+        );
+        return;
+      },
     },
-    async closeBundle() {
-      console.log("");
-      console.log(
-        "  " + chalk.cyanBright.bold("vite:electron:build:hook"),
-        "\tRenderer Builded"
-      );
-      await builder("prod", opt);
-      console.log(
-        "  " + chalk.cyanBright.bold("vite:electron:build"),
-        "\t Write `package.json`"
-      );
-      let s = JSON.parse(
-        fs.readFileSync(path.resolve(process.cwd(), "package.json"), "utf8")
-      );
-      delete s["scripts"];
-      fs.writeFileSync(
-        path.resolve(process.cwd(), "build", "package.json"),
-        JSON.stringify(s)
-      );
-      return;
-    },
-  },
-];
+  ];
+};
 
 export interface HookOptions {
   serve?: ServeHookOptions;
@@ -120,6 +144,6 @@ export default function ViteElectron(o: HookOptions = {}) {
       name: "vite:electron",
     },
     ...serveHook(o.serve, o.build),
-    ...buildHook(o.build),
+    ...buildHook(o.build, o.serve),
   ];
 }

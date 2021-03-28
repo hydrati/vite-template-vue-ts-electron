@@ -1,6 +1,7 @@
 import json from "@rollup/plugin-json";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import type { RollupOptions } from "rollup";
+import * as babel from "@rollup/plugin-babel";
 // import ts from "rollup-plugin-typescript2";
 import esbuild from "rollup-plugin-esbuild";
 import terser from "rollup-plugin-terser";
@@ -30,6 +31,19 @@ let config: RollupOptions = {
     }),
     commonjs({
       ignore: SKIP_MODULES,
+    }),
+    babel.babel({
+      presets: ["env"],
+      plugins: [
+        "proposal-nullish-coalescing-operator",
+        "proposal-numeric-separator",
+        "proposal-optional-chaining",
+        "proposal-throw-expressions",
+        "syntax-import-meta",
+        "syntax-top-level-await",
+        "transform-runtime",
+      ],
+      babelHelpers: "bundled",
     }),
     terser.terser({
       toplevel: false,

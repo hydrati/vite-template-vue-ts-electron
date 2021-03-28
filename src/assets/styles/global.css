@@ -10,3 +10,13 @@
 a {
     color: #41B883;
 }
+
+.logo {
+    width: 30vh;
+    padding: 3vh;
+    user-select: none;
+}
+
+.logo-electron {
+    border-radius: 50%;
+}

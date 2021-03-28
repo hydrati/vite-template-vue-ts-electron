@@ -15,7 +15,7 @@ export interface FilterConfig {
 
 export default (ifcfg: FilterConfig) =>
   ({
-    name: "Vitelectron",
+    name: "vite:electron:filter",
     enforce: "pre",
     apply: "serve",
 
@@ -142,3 +142,149 @@ export default (ifcfg: FilterConfig) =>
       }
     },
   } as Plugin);
+
+export const BuildFilter = (include: string[]) => {
+  const resolved = include.map((v) => require.resolve(v));
+  const cjsOpts = {
+    requireReturnsDefault: (i) => include.lastIndexOf(i) != -1,
+    transformMixedEsModules: true,
+    esmExternals: include,
+    ignore: include,
+  };
+  let aliaslist = {};
+  include.map((v) => (aliaslist[v] = "__vite-browser-external:" + v));
+  return {
+    name: "vite:electron:build:filter",
+    enforce: "pre",
+    apply: "build",
+    config(c) {
+      console.log(
+        chalk.cyan.bold("  vite:electron:build:filter"),
+        "\t",
+        "Register Alias..."
+      );
+      if (c.resolve == undefined) {
+        c.resolve = { alias: aliaslist };
+        return c;
+      } else if (c.resolve.alias instanceof Array) {
+        c.resolve.alias = { ...aliaslist, ...c.resolve.alias };
+        return c;
+      }
+
+      console.log(
+        chalk.cyan.bold("\n  vite:electron:build:filter"),
+        "\t",
+        "Injecting CommonJS Plugin...\n"
+      );
+      if (c.build == undefined) {
+        c.build = {
+          commonjsOptions: cjsOpts,
+        };
+        return c;
+      }
+
+      if (typeof c.build.commonjsOptions == "object") {
+        c.build.commonjsOptions = {
+          ...c.build.commonjsOptions,
+          ...cjsOpts,
+        };
+      }
+    },
+    load(id) {
+      if (/^__vite-browser-external:(.*?)$/.test(id)) {
+        console.log(
+          chalk.cyan.bold("\n  vite:electron:build:filter"),
+          "\t",
+          "Resolving External Module...\n"
+        );
+        let ma = id.match(/^__vite-browser-external:(.*?)$/);
+        console.log(
+          chalk.cyan.bold("\n  vite:electron:build:filter"),
+          "\t",
+          "Resolved to",
+          ma[1],
+          "\n"
+        );
+        id = ma[1];
+        if (include.lastIndexOf(id) != -1) {
+          let n = include.lastIndexOf(id);
+          return `"use strict";var _ref, _ref2, _ref3, _globalThis$require;var _require$ = (_ref = (_ref2 = (_ref3 = (_globalThis$require = globalThis.require) !== null && _globalThis$require !== void 0 ? _globalThis$require : global.require) !== null && _ref3 !== void 0 ? _ref3 : window.require) !== null && _ref2 !== void 0 ? _ref2 : (void 0).require) !== null && _ref !== void 0 ? _ref : function () {throw new Error("Not support CommonJS!");};export default _require$('${include[n]}');`;
+        }
+      }
+    },
+
+    transform(_, id) {
+      let p = path.normalize(id);
+      if (resolved.lastIndexOf(id) != -1) {
+        console.log(
+          chalk.cyan.bold("\n  vite:electron:build:filter"),
+          "\t",
+          "Resolving External Module...\n"
+        );
+        let n = resolved.lastIndexOf(id);
+        console.log(
+          chalk.cyan.bold("\n  vite:electron:build:filter"),
+          "\t",
+          "Resolved to",
+          include[n],
+          "\n"
+        );
+
+        return {
+          code: `"use strict";var _ref, _ref2, _ref3, _globalThis$require;var _require$ = (_ref = (_ref2 = (_ref3 = (_globalThis$require = globalThis.require) !== null && _globalThis$require !== void 0 ? _globalThis$require : global.require) !== null && _ref3 !== void 0 ? _ref3 : window.require) !== null && _ref2 !== void 0 ? _ref2 : (void 0).require) !== null && _ref !== void 0 ? _ref : function () {throw new Error("Not support CommonJS!");};export default _require$('${include[n]}');`,
+        };
+      } else if (include.lastIndexOf(p) != -1) {
+        console.log(
+          chalk.cyan.bold("\n  vite:electron:build:filter"),
+          "\t",
+          "Resolving External Module...\n"
+        );
+        let n = include.lastIndexOf(p);
+        console.log(
+          chalk.cyan.bold("\n  vite:electron:build:filter"),
+          "\t",
+          "Resolved to",
+          include[n],
+          "\n"
+        );
+        return {
+          code: `"use strict";var _ref, _ref2, _ref3, _globalThis$require;var _require$ = (_ref = (_ref2 = (_ref3 = (_globalThis$require = globalThis.require) !== null && _globalThis$require !== void 0 ? _globalThis$require : global.require) !== null && _ref3 !== void 0 ? _ref3 : window.require) !== null && _ref2 !== void 0 ? _ref2 : (void 0).require) !== null && _ref !== void 0 ? _ref : function () {throw new Error("Not support CommonJS!");};export default _require$('${include[n]}');`,
+        };
+      } else if (include.lastIndexOf(id) != -1) {
+        console.log(
+          chalk.cyan.bold("\n  vite:electron:build:filter"),
+          "\t",
+          "Resolving External Module...\n"
+        );
+        let n = include.lastIndexOf(id);
+        console.log(
+          chalk.cyan.bold("  vite:electron:build:filter"),
+          "\t",
+          "Resolved to",
+          include[n],
+          "\n"
+        );
+        return {
+          code: `"use strict";var _ref, _ref2, _ref3, _globalThis$require;var _require$ = (_ref = (_ref2 = (_ref3 = (_globalThis$require = globalThis.require) !== null && _globalThis$require !== void 0 ? _globalThis$require : global.require) !== null && _ref3 !== void 0 ? _ref3 : window.require) !== null && _ref2 !== void 0 ? _ref2 : (void 0).require) !== null && _ref !== void 0 ? _ref : function () {throw new Error("Not support CommonJS!");};export default _require$('${include[n]}');`,
+        };
+      } else if (resolved.lastIndexOf(p) != -1) {
+        console.log(
+          chalk.cyan.bold("  vite:electron:build:filter"),
+          "\t",
+          "Resolving External Module...\n"
+        );
+        let n = resolved.lastIndexOf(p);
+        console.log(
+          chalk.cyan.bold("  vite:electron:build:filter"),
+          "\t",
+          "Resolved to",
+          include[n],
+          "\n"
+        );
+        return {
+          code: `"use strict";var _ref, _ref2, _ref3, _globalThis$require;var _require$ = (_ref = (_ref2 = (_ref3 = (_globalThis$require = globalThis.require) !== null && _globalThis$require !== void 0 ? _globalThis$require : global.require) !== null && _ref3 !== void 0 ? _ref3 : window.require) !== null && _ref2 !== void 0 ? _ref2 : (void 0).require) !== null && _ref !== void 0 ? _ref : function () {throw new Error("Not support CommonJS!");};export default _require$('${include[n]}');`,
+        };
+      }
+    },
+  } as Plugin;
+};

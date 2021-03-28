@@ -4,7 +4,7 @@ import json from "@rollup/plugin-json";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import type { RollupOptions } from "rollup";
 import SKIP_MODULES from "./externalist";
-
+import { babel } from "@rollup/plugin-babel";
 let config: RollupOptions = {
   // input: path.resolve(process.cwd(), "src", "app", "app.ts"),
   plugins: [
@@ -22,6 +22,16 @@ let config: RollupOptions = {
       target: "esnext",
       tsconfig: path.resolve(process.cwd(), "tsconfig.app.json"),
       sourceMap: true,
+    }),
+    babel({
+      presets: ["env"],
+      plugins: [
+        "proposal-numeric-separator",
+        "proposal-throw-expressions",
+        "syntax-import-meta",
+        "syntax-top-level-await",
+      ],
+      babelHelpers: "bundled",
     }),
   ],
   treeshake: true,

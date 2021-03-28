@@ -1,20 +1,16 @@
-import { app, BrowserWindow, ipcMain, protocol } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
+import protocolRegister from "./utils/protocolRegister";
 import process from "process";
-import * as path from "path";
-import { request } from "http";
+import chalk from "chalk";
+import path from "path";
+
 process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "false";
-protocol.registerSchemesAsPrivileged([
-  {
-    privileges: {
-      standard: true,
-      secure: true,
-      bypassCSP: true,
-      corsEnabled: true,
-    },
-    scheme: "app",
-  },
-]);
+
+const protocol = protocolRegister("app");
+protocol.privileged();
+
 app.whenReady().then(() => {
+  protocol.register();
   let w = new BrowserWindow({
     webPreferences: {
       nodeIntegration: true,
@@ -25,16 +21,10 @@ app.whenReady().then(() => {
   });
   if (process.env["NODE_ENV"] == "development") {
     w.loadURL("http://localhost:" + process.env["DEV_SERVER_PORT"]);
+    w.webContents.openDevTools();
   } else {
-    protocol.registerFileProtocol("app", (req, cb) => {
-      const url = new URL(req.url);
-
-      if (url.pathname == "/")
-        cb({ path: path.normalize(`${__dirname}/index.html`) });
-
-      cb({ path: path.normalize(`${__dirname}/${url}`) });
-    });
-    w.loadURL("app://./");
+    w.loadURL(`app://./`);
   }
-  ipcMain.on("msg", () => console.log("get message"));
+
+  ipcMain.on("msg", () => console.log("main: hello!"));
 });
