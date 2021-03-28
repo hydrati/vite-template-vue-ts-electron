@@ -10,7 +10,6 @@ export interface FilterConfig {
   include: "$dev" | string[];
   exclude?: string[];
   force?: boolean;
-  requireFn?: string;
 }
 
 export default (ifcfg: FilterConfig) =>
@@ -125,12 +124,7 @@ export default (ifcfg: FilterConfig) =>
             d?.groups?.name + "\n"
           );
           return {
-            code:
-              "const __esModule = false; export {__esModule}; const o = " +
-              (ifcfg.requireFn ?? "globalThis.require") +
-              "('" +
-              d?.groups?.name +
-              "'); export {o as default};",
+            code: `"use strict";var _ref, _ref2, _ref3, _globalThis$require;var _require$ = (_ref = (_ref2 = (_ref3 = (_globalThis$require = globalThis.require) !== null && _globalThis$require !== void 0 ? _globalThis$require : global.require) !== null && _ref3 !== void 0 ? _ref3 : window.require) !== null && _ref2 !== void 0 ? _ref2 : (void 0).require) !== null && _ref !== void 0 ? _ref : function () {throw new Error("Not support CommonJS!");};export default _require$('${d.groups?.name}');`,
             map: null,
           };
         }
