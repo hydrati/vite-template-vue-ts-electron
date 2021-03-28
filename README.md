@@ -3,11 +3,8 @@
 This template should help get you started developing with Vue 3, Typescript and Electron in Vite.
 
 ```
-# Install
+# Install dependencies
 yarn
-
-# Build Scripts
-yarn build:scripts
 
 # Serve with hot reload
 yarn dev
