@@ -10,6 +10,11 @@ export default defineConfig({
     vue(),
     jsx(),
     viteElectron({
+      serve: {
+        filter: {
+          include: [],
+        },
+      },
       build: {
         preload: "preload.ts",
       },
