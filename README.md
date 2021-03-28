@@ -1,6 +1,5 @@
 # Vue 3 + Typescript + Vite + Electron 
-## 
-This template should help get you started developing with Vue 3, Typescript and Electron in Vite.
+### This template should help get you started developing with Vue 3, Typescript and Electron in Vite.
 
 ```
 # Install dependencies
