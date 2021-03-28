@@ -5,7 +5,7 @@ import viteElectron from "./scripts/hooks";
 
 // https://vitejs.dev/config/
 
-const config = defineConfig({
+export default defineConfig({
   plugins: [
     vue(),
     jsx(),
@@ -16,5 +16,3 @@ const config = defineConfig({
     }),
   ],
 });
-
-export default config;
