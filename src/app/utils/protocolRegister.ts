@@ -1,8 +1,8 @@
-import { protocol, Protocol, Privileges } from "electron";
+import { protocol, Protocol, CustomScheme, Privileges } from "electron";
 import { readFile, readFileSync } from "fs";
 import path from "path";
 export interface ProtocolRegister {
-  privileged: () => void;
+  privileged: () => CustomScheme;
   register: () => void;
 }
 
@@ -48,20 +48,17 @@ export default (
           });
         }
       ),
-    privileged: () =>
-      (customProtocol ?? protocol).registerSchemesAsPrivileged([
-        {
-          scheme: "app",
-          privileges: privileged ?? {
-            allowServiceWorkers: true,
-            bypassCSP: true,
-            corsEnabled: true,
-            secure: true,
-            standard: true,
-            stream: true,
-            supportFetchAPI: true,
-          },
-        },
-      ]),
+    privileged: () => ({
+      scheme: "app",
+      privileges: privileged ?? {
+        allowServiceWorkers: true,
+        bypassCSP: true,
+        corsEnabled: true,
+        secure: true,
+        standard: true,
+        stream: true,
+        supportFetchAPI: true,
+      },
+    }),
   };
 };

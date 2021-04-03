@@ -1,17 +1,17 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, protocol } from "electron";
 import protocolRegister from "./utils/protocolRegister";
 import process from "process";
-import chalk from "chalk";
 import path from "path";
 
 process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "false";
 
-const protocol = protocolRegister("app");
-protocol.privileged();
+let mainWindow: BrowserWindow;
+const myProtocol = protocolRegister("app");
+protocol.registerSchemesAsPrivileged([myProtocol.privileged()]);
 
 app.whenReady().then(() => {
-  protocol.register();
-  let w = new BrowserWindow({
+  myProtocol.register();
+  mainWindow = new BrowserWindow({
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -20,10 +20,10 @@ app.whenReady().then(() => {
     },
   });
   if (process.env["NODE_ENV"] == "development") {
-    w.loadURL("http://localhost:" + process.env["DEV_SERVER_PORT"]);
-    w.webContents.openDevTools();
+    mainWindow.loadURL("http://localhost:" + process.env["DEV_SERVER_PORT"]);
+    mainWindow.webContents.openDevTools();
   } else {
-    w.loadURL(`app://./`);
+    mainWindow.loadURL(`app://./`);
   }
 
   ipcMain.on("msg", () => console.log("main: hello!"));
