@@ -2,6 +2,10 @@
     "name": "vite-template-vue-ts-electron",
     "version": "1.0.0",
     "license": "MIT",
+    "author": {
+        "email": "hello@example.com",
+        "name": "john"
+    },
     "main": "main.js",
     "scripts": {
         "dev": "vue-tsc --noEmit && vite --debug",
@@ -48,8 +52,10 @@
         "del-cli": "^3.0.1",
         "electron": "^12.0.2",
         "electron-builder": "^22.10.5",
+        "electron-rebuild": "^2.3.5",
         "electronmon": "^1.1.2",
         "esbuild": "^0.10.2",
+        "node-abi": "^2.21.0",
         "rollup": "^2.39.1",
         "rollup-plugin-esbuild": "^3.0.2",
         "rollup-plugin-terser": "^7.0.2",
